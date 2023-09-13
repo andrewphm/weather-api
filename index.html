@@ -3,8 +3,37 @@
   <head>
     <title>Ms Merriweather</title>
     <link rel="stylesheet" href="styles.css">
+
+
   </head>
   <body>
+
+
+    <style>
+      #city-search, #zip-search, #coor-search {
+        color: blue;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
+      .sub-heading {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      .show {
+        display: block;
+      }
+
+      #coordinates-long {
+        border-radius: 0% 0% 0% 0% !important;
+      }
+
+    </style>
     <div class="container">
       <h1 id="temp">
         <!--Temp -->
@@ -12,30 +41,81 @@
       <p id="desc">
         <!-- description -->
       </p>
-      <form id="form">
-        <input
-          id="zip"
-          type="number"
-          placeholder="zip code"
-          title="Please Enter a valid Zip Code"
-          pattern="^\d{5}(?:[-\s]\d{4})?$"
-        >
-        <button type="submit">Search</button>
-      </form>
+
+
+      <div class="sub-heading">
+        Search by <span data-name="coordinates" id="coor-search" onclick="handleChangeInput(event)">coordinates,</span> <span data-name="city" id="city-search" onclick="handleChangeInput(event)">city,</span> or <span id="zip-search" data-name="zip" onclick="handleChangeInput(event)">zip code</span>.
+      </div>
+
+      <div>
+        <form id="form" >
+          <input
+            id="zip"
+            type="text"
+            placeholder="zip code"
+            name="zip"
+          >
+
+          <input
+          id="coordinates"
+          type="text"
+          placeholder="latitude, longitude"
+          name="coordinates"
+          class="hide"
+          >
+
+          <input
+          id="city"
+          type="text"
+          placeholder="city name"
+          name="city"
+          class="hide"
+
+          >
+
+          <button type="submit">Search</button>
+        </form>
+      </div>
     </div>
 
     <script src="scripts/index.js"></script>
     <script>
-            // Get Element refererences
+        // Get Element refererences
         const tempEl = document.getElementById('temp');
         const descEl = document.getElementById('desc');
         const formEl = document.getElementById('form');
         const zipInput = document.getElementById('zip');
+        const cityInput = document.getElementById('city');
+        const coorInput = document.getElementById('coordinates');
+
+
+        const inputs = [zipInput, cityInput, coorInput];
+
+        const handleChangeInput = async (e) => {
+          const name = e.target.getAttribute('data-name');
+          for (const input of inputs) {
+            if (input.getAttribute('name') === name) {
+              input.classList.remove('hide');
+            } else {
+              input.classList.add('hide');
+            }
+          }
+
+        }
 
         const handleSubmit = async (e) => {
+          // e.preventDefault();
           e.preventDefault();
-          const zip = zipInput.value;
-          const {temp, description} = await getWeather(apiKey, zip);
+          let usedInput;
+          inputs.forEach(input => {
+            if (!input.classList.contains('hide')) {
+              usedInput = input;
+            }
+          })
+
+          const value = usedInput.value;
+          const name = usedInput.getAttribute('name');
+          const {temp, description} = await getWeather(value, name);
           tempEl.innerHTML = temp;
           descEl.innerHTML = description;
         }
@@ -43,13 +123,5 @@
         // Define event listeners
         formEl.addEventListener('submit', handleSubmit);
     </script>
-
-
-
-
-
-
-
-
   </body>
 </html>
